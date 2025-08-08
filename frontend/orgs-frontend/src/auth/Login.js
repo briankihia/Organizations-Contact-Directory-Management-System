@@ -66,21 +66,50 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
+//   const handleLogin = async (e) => {
+//     e.preventDefault();
+//     setError('');
 
-    try {
-      const res = await axios.post('/token/', { username, password });
-      localStorage.setItem('access', res.data.access);
-      localStorage.setItem('refresh', res.data.refresh);
+//     try {
+//       const res = await axios.post('/token/', { username, password });
+//       localStorage.setItem('access', res.data.access);
+//       localStorage.setItem('refresh', res.data.refresh);
       
-      // Navigate after storing tokens
-      setTimeout(() => navigate('/organizations'), 100);
+//       // Navigate after storing tokens
+//       setTimeout(() => navigate('/organizations'), 100);
+//     } catch (err) {
+//       alert("Login failed!");
+//     }
+//   };
+
+    const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+        console.log('Attempting to log in with username:', username, 'and password:', password);
+        const res = await axios.post("/token/", { username, password });
+        console.log('Received response from server:', res);
+        localStorage.setItem("access", res.data.access);
+        localStorage.setItem("refresh", res.data.refresh);
+        console.log('Stored access and refresh tokens in local storage');
+        // Optional: Fetch user role
+        const profile = await axios.get("/profile/");
+        console.log('Received profile data from server:', profile);
+        localStorage.setItem("role", profile.data.role);
+        console.log('Stored user role in local storage');
+        // Redirect based on role
+        if (profile.data.role === "admin") {
+        navigate("/admin-dashboard");
+        } else {
+        navigate("/organizations");
+        }
+        console.log('Redirecting to:', profile.data.role === "admin" ? "/admin-dashboard" : "/organizations");
     } catch (err) {
-      alert("Login failed!");
+        console.error('Error logging in:', err);
+        setError("Invalid username or password");
     }
-  };
+    };
+
+
 
   return (
     <Container maxWidth="sm">
