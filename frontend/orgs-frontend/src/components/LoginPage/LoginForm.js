@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { saveSession } from '../../slices/sessionSlice'; // Removed saveUser
+import { saveSession } from '../../slices/sessionSlice';
 import './LoginForm.css';
 
 function LoginForm() {
@@ -24,7 +24,7 @@ function LoginForm() {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // if using Django cookies
+      credentials: 'include', // If using Django cookies
     });
 
     if (response.ok) {
@@ -32,10 +32,11 @@ function LoginForm() {
       console.log('Login successful. Response data:', data);
 
       const { access: token, user } = data;
-      console.log('Access Token:', token); // Output the access token
+      console.log('Access Token:', token);
       console.log('User:', user);
+      console.log('User Role:', user.role); // 👈 Logs role from backend
 
-      dispatch(saveSession({ token, user })); // Save both token and user
+      dispatch(saveSession({ token, user })); // Save token + user to Redux
       return { success: true };
     } else {
       const errorData = await response.json();
@@ -53,7 +54,7 @@ function LoginForm() {
     const result = await loginUser(formData);
     if (result.success) {
       alert('Login successful!');
-      navigate('/'); // Redirect to dashboard or another page
+      navigate('/'); // Redirect after login
     } else {
       setError(result.message);
     }
@@ -99,3 +100,4 @@ function LoginForm() {
 }
 
 export default LoginForm;
+

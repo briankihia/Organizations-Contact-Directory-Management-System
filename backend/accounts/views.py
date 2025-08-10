@@ -21,6 +21,11 @@ def user_login(request):
 
     if user is not None:
         refresh = RefreshToken.for_user(user)
+           # If role is a field in the user model
+        role = getattr(user, 'role', None)  # This avoids errors if role doesn't exist
+
+        # If using groups instead, you can get the first group name
+        # role = user.groups.first().name if user.groups.exists() else None
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -29,7 +34,8 @@ def user_login(request):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
-                'id': user.id
+                'id': user.id,
+                'role': role
             },
         }, status=status.HTTP_200_OK)
     else:
