@@ -21,6 +21,7 @@ const Organizations = () => {
     logo_url: '', founded_date: '', tax_id: '',
     industry: ''
   });
+  const [errors, setErrors] = useState({}); // For inline validation errors
 
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -31,7 +32,6 @@ const Organizations = () => {
     if (session?.token) {
       setToken(session.token);
       setUser(session.user);
-      // set token for axios
       axios.defaults.headers.common['Authorization'] = `Bearer ${session.token}`;
     } else {
       alert('You must be logged in to view organizations');
@@ -69,17 +69,44 @@ const Organizations = () => {
         tax_id: org.tax_id,
         industry: org.industry,
       });
+    } else {
+      setForm({
+        name: '', description: '', website: '',
+        logo_url: '', founded_date: '', tax_id: '',
+        industry: ''
+      });
     }
+    setErrors({});
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
     setEditingOrg(null);
-    setForm({ name: '', description: '', website: '', logo_url: '', founded_date: '', tax_id: '', industry: '' });
+    setForm({
+      name: '', description: '', website: '',
+      logo_url: '', founded_date: '', tax_id: '',
+      industry: ''
+    });
+    setErrors({});
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!form.name.trim()) newErrors.name = 'Name is required';
+    if (!form.description.trim()) newErrors.description = 'Description is required';
+    if (!form.founded_date) newErrors.founded_date = 'Founded Date is required';
+    if (!form.tax_id.trim()) newErrors.tax_id = 'Tax ID is required';
+    if (!form.industry) newErrors.industry = 'Industry is required';
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0; // valid if no errors
   };
 
   const handleSubmit = async () => {
+    if (!validate()) return;
+
     try {
       if (editingOrg) {
         await updateOrganization(editingOrg.id, form);
@@ -106,7 +133,6 @@ const Organizations = () => {
     <>
       <Typography variant="h4" gutterBottom>Organizations</Typography>
 
-      {/* Changed is_superuser check to role check */}
       {user?.role === 'admin' && (
         <Button variant="contained" onClick={() => handleOpen()}>Add Organization</Button>
       )}
@@ -134,7 +160,6 @@ const Organizations = () => {
               <TableCell>{org.industry}</TableCell>
               <TableCell>{org.is_active ? 'Active' : 'Inactive'}</TableCell>
               <TableCell>
-                {/* Changed is_superuser check to role check */}
                 {user?.role === 'admin' && (
                   <>
                     <Button onClick={() => handleOpen(org)}>Edit</Button>
@@ -149,24 +174,73 @@ const Organizations = () => {
         </TableBody>
       </Table>
 
-      {/* Modal Form */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{editingOrg ? 'Edit Organization' : 'Add Organization'}</DialogTitle>
         <DialogContent>
-          <TextField fullWidth label="Name" margin="dense" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <TextField fullWidth label="Description" margin="dense" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          <TextField fullWidth label="Website" margin="dense" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
-          <TextField fullWidth label="Logo URL" margin="dense" value={form.logo_url} onChange={(e) => setForm({ ...form, logo_url: e.target.value })} />
-          <TextField fullWidth label="Founded Date" type="date" margin="dense" value={form.founded_date} onChange={(e) => setForm({ ...form, founded_date: e.target.value })} InputLabelProps={{ shrink: true }} />
-          <TextField fullWidth label="Tax ID" margin="dense" value={form.tax_id} onChange={(e) => setForm({ ...form, tax_id: e.target.value })} />
-          
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Industry</InputLabel>
-            <Select value={form.industry} label="Industry" onChange={(e) => setForm({ ...form, industry: e.target.value })}>
+          <TextField
+            fullWidth
+            label="Name *"
+            margin="dense"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            error={!!errors.name}
+            helperText={errors.name}
+          />
+          <TextField
+            fullWidth
+            label="Description *"
+            margin="dense"
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            error={!!errors.description}
+            helperText={errors.description}
+          />
+          <TextField
+            fullWidth
+            label="Website"
+            margin="dense"
+            value={form.website}
+            onChange={(e) => setForm({ ...form, website: e.target.value })}
+          />
+          <TextField
+            fullWidth
+            label="Logo URL"
+            margin="dense"
+            value={form.logo_url}
+            onChange={(e) => setForm({ ...form, logo_url: e.target.value })}
+          />
+          <TextField
+            fullWidth
+            label="Founded Date *"
+            type="date"
+            margin="dense"
+            value={form.founded_date}
+            onChange={(e) => setForm({ ...form, founded_date: e.target.value })}
+            InputLabelProps={{ shrink: true }}
+            error={!!errors.founded_date}
+            helperText={errors.founded_date}
+          />
+          <TextField
+            fullWidth
+            label="Tax ID *"
+            margin="dense"
+            value={form.tax_id}
+            onChange={(e) => setForm({ ...form, tax_id: e.target.value })}
+            error={!!errors.tax_id}
+            helperText={errors.tax_id}
+          />
+          <FormControl fullWidth margin="dense" error={!!errors.industry}>
+            <InputLabel>Industry *</InputLabel>
+            <Select
+              value={form.industry}
+              label="Industry *"
+              onChange={(e) => setForm({ ...form, industry: e.target.value })}
+            >
               {industries.map(ind => (
                 <MenuItem key={ind.id} value={ind.id}>{ind.name}</MenuItem>
               ))}
             </Select>
+            {errors.industry && <Typography color="error" variant="caption">{errors.industry}</Typography>}
           </FormControl>
         </DialogContent>
         <DialogActions>
