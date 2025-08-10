@@ -128,13 +128,22 @@ const Organizations = () => {
     fetchData();
   };
 
-  // Filter organizations by name, industry, and status
+  // Filter organizations by name, industry, and status,
+  // but hide inactive organizations from normal users
   const filtered = organizations.filter(org => {
     const matchesName = org.name.toLowerCase().includes(search.toLowerCase());
     const matchesIndustry = industryFilter ? org.industry === industryFilter : true;
+
+    if (user?.role !== 'admin') {
+      // Normal users see only active orgs
+      return matchesName && matchesIndustry && org.is_active;
+    }
+
+    // Admin can filter by status
     const matchesStatus = statusFilter
       ? (statusFilter === 'active' ? org.is_active : !org.is_active)
       : true;
+
     return matchesName && matchesIndustry && matchesStatus;
   });
 
@@ -172,6 +181,7 @@ const Organizations = () => {
             value={statusFilter}
             label="Status"
             onChange={(e) => setStatusFilter(e.target.value)}
+            disabled={user?.role !== 'admin'} // disable for non-admins
           >
             <MenuItem value="">All</MenuItem>
             <MenuItem value="active">Active</MenuItem>
