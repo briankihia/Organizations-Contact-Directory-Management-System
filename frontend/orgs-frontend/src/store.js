@@ -4,7 +4,7 @@ import storage from 'redux-persist/lib/storage'; // Use sessionStorage if you pr
 import { thunk } from 'redux-thunk'; // Corrected import
 
 import sessionReducer from './slices/sessionSlice'; // We'll create this next
-import cartReducer from './slices/cartSlice'; // Import cartSlice
+// import cartReducer from './slices/cartSlice'; // Import cartSlice
 
 const persistConfig = {
   key: 'root',
@@ -14,7 +14,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   session: sessionReducer,
-  cart: cartReducer, // Add cart reducer
+  // cart: cartReducer, // Add cart reducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
