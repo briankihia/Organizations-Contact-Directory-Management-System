@@ -54,7 +54,7 @@ function LoginForm() {
     const result = await loginUser(formData);
     if (result.success) {
       alert('Login successful!');
-      navigate('/'); // Redirect after login
+      navigate('/organizations'); // Redirect after login
     } else {
       setError(result.message);
     }
