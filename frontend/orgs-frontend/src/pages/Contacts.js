@@ -13,10 +13,17 @@ const Contacts = () => {
   const [orgs, setOrgs] = useState([]);
   const [formData, setFormData] = useState({
     id: null,
-    name: '',
+    organization: '',
+    first_name: '',
+    last_name: '',
+    job_title: '',
+    department: '',
+    is_primary_contact: false,
+    notes: '',
     email: '',
-    phone: '',
-    organization: '', // Set to empty for dropdown
+    office_phone_number: '',
+    mobile_phone_number: '',
+    is_active: true,
   });
 
   const [editing, setEditing] = useState(false);
@@ -37,7 +44,7 @@ const Contacts = () => {
 
   const loadOrganizations = async () => {
     try {
-      const orgList = await getOrganizations(); // Already returns res.data
+      const orgList = await getOrganizations();
       const activeOrgs = orgList.filter((org) => org.is_active);
       setOrgs(activeOrgs);
     } catch (err) {
@@ -46,10 +53,10 @@ const Contacts = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -66,10 +73,17 @@ const Contacts = () => {
       loadContacts();
       setFormData({
         id: null,
-        name: '',
-        email: '',
-        phone: '',
         organization: '',
+        first_name: '',
+        last_name: '',
+        job_title: '',
+        department: '',
+        is_primary_contact: false,
+        notes: '',
+        email: '',
+        office_phone_number: '',
+        mobile_phone_number: '',
+        is_active: true,
       });
       setEditing(false);
     } catch (err) {
@@ -78,7 +92,21 @@ const Contacts = () => {
   };
 
   const handleEdit = (contact) => {
-    setFormData(contact);
+    // Adjust backend response keys if needed here
+    setFormData({
+      id: contact.id,
+      organization: contact.organization,
+      first_name: contact.first_name,
+      last_name: contact.last_name,
+      job_title: contact.job_title || '',
+      department: contact.department || '',
+      is_primary_contact: contact.is_primary_contact || false,
+      notes: contact.notes || '',
+      email: contact.email,
+      office_phone_number: contact.office_phone_number || '',
+      mobile_phone_number: contact.mobile_phone_number || '',
+      is_active: contact.is_active !== undefined ? contact.is_active : true,
+    });
     setEditing(true);
   };
 
@@ -95,27 +123,6 @@ const Contacts = () => {
     <div>
       <h2>Contacts</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Name"
-          required
-        />
-        <input
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Email"
-          required
-        />
-        <input
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          placeholder="Phone"
-          required
-        />
         <select
           name="organization"
           value={formData.organization}
@@ -129,13 +136,89 @@ const Contacts = () => {
             </option>
           ))}
         </select>
+
+        <input
+          name="first_name"
+          value={formData.first_name}
+          onChange={handleChange}
+          placeholder="First Name"
+          required
+        />
+        <input
+          name="last_name"
+          value={formData.last_name}
+          onChange={handleChange}
+          placeholder="Last Name"
+          required
+        />
+        <input
+          name="job_title"
+          value={formData.job_title}
+          onChange={handleChange}
+          placeholder="Job Title"
+        />
+        <input
+          name="department"
+          value={formData.department}
+          onChange={handleChange}
+          placeholder="Department"
+        />
+
+        <label>
+          Primary Contact:
+          <input
+            type="checkbox"
+            name="is_primary_contact"
+            checked={formData.is_primary_contact}
+            onChange={handleChange}
+          />
+        </label>
+
+        <textarea
+          name="notes"
+          value={formData.notes}
+          onChange={handleChange}
+          placeholder="Notes"
+        />
+
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Email"
+          required
+        />
+        <input
+          name="office_phone_number"
+          value={formData.office_phone_number}
+          onChange={handleChange}
+          placeholder="Office Phone Number"
+        />
+        <input
+          name="mobile_phone_number"
+          value={formData.mobile_phone_number}
+          onChange={handleChange}
+          placeholder="Mobile Phone Number"
+        />
+
+        <label>
+          Active:
+          <input
+            type="checkbox"
+            name="is_active"
+            checked={formData.is_active}
+            onChange={handleChange}
+          />
+        </label>
+
         <button type="submit">{editing ? 'Update' : 'Create'} Contact</button>
       </form>
 
       <ul>
         {contacts.map((contact) => (
           <li key={contact.id}>
-            <strong>{contact.name}</strong> - {contact.email} - {contact.phone} - Org: {contact.organization_name || contact.organization}
+            <strong>{contact.first_name} {contact.last_name}</strong> - {contact.email} - {contact.mobile_phone_number} - Org: {contact.organization_name || contact.organization}
             <button onClick={() => handleEdit(contact)}>Edit</button>
             <button onClick={() => handleDelete(contact.id)}>Delete</button>
           </li>

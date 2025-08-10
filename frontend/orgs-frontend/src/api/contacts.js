@@ -9,9 +9,11 @@
 // export const deleteContact = (id) => axios.delete(`${BASE_URL}${id}/`);
 
 
-import axios from './axios'; // Make sure this is configured with baseURL
+import axios from '../pages/axios';
 
-export const fetchContacts = () => axios.get('/contacts/');
-export const createContact = (data) => axios.post('/contacts/', data);
-export const updateContact = (id, data) => axios.put(`/contacts/${id}/`, data);
-export const deleteContact = (id) => axios.delete(`/contacts/${id}/`);
+const BASE_URL = '/api/contacts/';
+
+export const fetchContacts = () => axios.get(BASE_URL);
+export const createContact = (data) => axios.post(BASE_URL, data);
+export const updateContact = (id, data) => axios.put(`${BASE_URL}${id}/`, data);
+export const deleteContact = (id) => axios.delete(`${BASE_URL}${id}/`);

@@ -23,7 +23,7 @@ class OrganizationViewSet(viewsets.ModelViewSet):
 class ContactViewSet(viewsets.ModelViewSet):
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
-    permission_classes = [IsAuthenticated, IsUserRole]  # Only normal users
+    permission_classes = [IsAuthenticated]  # Only normal users
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
