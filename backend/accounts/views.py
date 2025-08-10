@@ -37,7 +37,8 @@ def user_login(request):
 
 
 from django.contrib.auth.models import Group  # Import Group model
-from store.models import Customer  # Import the Customer model
+
+
 
 @api_view(['POST'])
 def register(request):
@@ -53,12 +54,12 @@ def register(request):
         )
         user.save()
 
-        # Assign the user to the "customer" group (optional)
-        customer_group, created = Group.objects.get_or_create(name='customer')
-        user.groups.add(customer_group)
+        # # Assign the user to the "customer" group (optional)
+        # customer_group, created = Group.objects.get_or_create(name='customer')
+        # user.groups.add(customer_group)
 
-        # Create a Customer object for the user
-        Customer.objects.create(user=user, name=user.first_name, email=user.email)
+        # # Create a Customer object for the user
+        # Customer.objects.create(user=user, name=user.first_name, email=user.email)
 
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
@@ -68,6 +69,7 @@ def register(request):
         }, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 def user_logout(request):
     logout(request)
