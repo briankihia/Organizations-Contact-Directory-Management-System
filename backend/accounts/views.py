@@ -1,14 +1,11 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.models import User, auth
-from django.urls import reverse
-from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import logout, authenticate
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from django.contrib.auth import authenticate
 
 
 @api_view(['POST'])
@@ -21,11 +18,10 @@ def user_login(request):
 
     if user is not None:
         refresh = RefreshToken.for_user(user)
-           # If role is a field in the user model
-        role = getattr(user, 'role', None)  # This avoids errors if role doesn't exist
 
-        # If using groups instead, you can get the first group name
-        # role = user.groups.first().name if user.groups.exists() else None
+        # Role is now based on is_superuser
+        role = "admin" if user.is_superuser else "normal"
+
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -42,15 +38,11 @@ def user_login(request):
         return Response({'error': 'Invalid email or password.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-from django.contrib.auth.models import Group  # Import Group model
-
-
-
 @api_view(['POST'])
 def register(request):
     data = request.data
     try:
-        # Create the user
+        # Create the user (default: not superuser, not staff)
         user = User.objects.create_user(
             username=data['email'],
             first_name=data['firstName'],
@@ -60,19 +52,15 @@ def register(request):
         )
         user.save()
 
-        # # Assign the user to the "customer" group (optional)
-        # customer_group, created = Group.objects.get_or_create(name='customer')
-        # user.groups.add(customer_group)
-
-        # # Create a Customer object for the user
-        # Customer.objects.create(user=user, name=user.first_name, email=user.email)
-
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
+            'message': 'User registered successfully',
+            'role': 'normal'  # Always normal at registration
         }, status=status.HTTP_201_CREATED)
+
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -83,7 +71,4 @@ def user_logout(request):
 
 
 def check_authentication(request):
-    if request.user.is_authenticated:
-        return JsonResponse({'authenticated': True})
-    else:
-        return JsonResponse({'autheticated': False})
+    return JsonResponse({'authenticated': request.user.is_authenticated})
