@@ -34,9 +34,15 @@ function LoginForm() {
       const { access: token, user } = data;
       console.log('Access Token:', token);
       console.log('User:', user);
-      console.log('User Role:', user.role); // 👈 Logs role from backend
+      console.log('User Role:', user.role);
 
-      dispatch(saveSession({ token, user })); // Save token + user to Redux
+      // Store in Redux
+      dispatch(saveSession({ token, user }));
+
+      // Store in localStorage for persistence
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user)); // includes role
+
       return { success: true };
     } else {
       const errorData = await response.json();
@@ -54,7 +60,14 @@ function LoginForm() {
     const result = await loginUser(formData);
     if (result.success) {
       alert('Login successful!');
-      navigate('/organizations'); // Redirect after login
+
+      // Redirect based on role
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if (storedUser?.role === 'admin') {
+        navigate('/organizations');
+      } else {
+        navigate('/organizations');
+      }
     } else {
       setError(result.message);
     }
@@ -100,4 +113,3 @@ function LoginForm() {
 }
 
 export default LoginForm;
-

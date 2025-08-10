@@ -21,7 +21,7 @@ function DropdownMenu() {
     logout(); // Clear tokens from localStorage
     dispatch(logoutSession()); // Clear session data from Redux state
     // dispatch(clearCart()); // Clear cart data from Redux state
-    navigate('/Login'); // Redirect to the login page
+    navigate('/'); // Redirect to the login page
   };
 
   return (

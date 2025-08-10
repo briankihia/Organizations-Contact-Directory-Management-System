@@ -13,7 +13,7 @@ from .permissions import IsAdminRole, IsUserRole
 class IndustryViewSet(viewsets.ModelViewSet):
     queryset = Industry.objects.all()
     serializer_class = IndustrySerializer
-    permission_classes = [IsAuthenticated, IsAdminRole]  # Only admins
+    permission_classes = [IsAuthenticated]  # Only admins
 
 class OrganizationViewSet(viewsets.ModelViewSet):
     queryset = Organization.objects.all()

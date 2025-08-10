@@ -8,6 +8,7 @@ import {
   getOrganizations, getIndustries,
   addOrganization, updateOrganization, toggleOrganizationStatus
 } from '../api/organizations';
+import axios from 'axios';
 
 const Organizations = () => {
   const [organizations, setOrganizations] = useState([]);
@@ -21,17 +22,40 @@ const Organizations = () => {
     industry: ''
   });
 
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+
+  // Load session from localStorage
+  useEffect(() => {
+    const session = JSON.parse(localStorage.getItem('session'));
+    if (session?.token) {
+      setToken(session.token);
+      setUser(session.user);
+      // set token for axios
+      axios.defaults.headers.common['Authorization'] = `Bearer ${session.token}`;
+    } else {
+      alert('You must be logged in to view organizations');
+      window.location.href = '/login';
+    }
+  }, []);
+
   const fetchData = async () => {
-    const orgs = await getOrganizations();  // Now returns organizations data as defined in your API logic
-    const inds = await getIndustries();       // Similarly returns industries data
-    setOrganizations(orgs);
-    setIndustries(inds);
+    try {
+      const orgs = await getOrganizations();
+      const inds = await getIndustries();
+      setOrganizations(orgs);
+      setIndustries(inds);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load data');
+    }
   };
 
   useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (token) {
+      fetchData();
+    }
+  }, [token]);
 
   const handleOpen = (org = null) => {
     if (org) {
@@ -81,7 +105,9 @@ const Organizations = () => {
   return (
     <>
       <Typography variant="h4" gutterBottom>Organizations</Typography>
-      <Button variant="contained" onClick={() => handleOpen()}>Add Organization</Button>
+      {user && user.is_superuser && (
+        <Button variant="contained" onClick={() => handleOpen()}>Add Organization</Button>
+      )}
       <TextField
         label="Search by name"
         value={search}
@@ -105,10 +131,14 @@ const Organizations = () => {
               <TableCell>{org.industry}</TableCell>
               <TableCell>{org.is_active ? 'Active' : 'Inactive'}</TableCell>
               <TableCell>
-                <Button onClick={() => handleOpen(org)}>Edit</Button>
-                <Button onClick={() => handleToggleStatus(org)}>
-                  {org.is_active ? 'Deactivate' : 'Activate'}
-                </Button>
+                {user?.is_superuser && (
+                  <>
+                    <Button onClick={() => handleOpen(org)}>Edit</Button>
+                    <Button onClick={() => handleToggleStatus(org)}>
+                      {org.is_active ? 'Deactivate' : 'Activate'}
+                    </Button>
+                  </>
+                )}
               </TableCell>
             </TableRow>
           ))}

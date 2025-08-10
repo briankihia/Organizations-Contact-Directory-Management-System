@@ -1,8 +1,18 @@
 import axios from 'axios';
 
+// Create instance
 const API = axios.create({
   baseURL: 'http://localhost:8000/api',
-  withCredentials: true, // optional: if you use cookies
+});
+
+// Add interceptor to inject token
+API.interceptors.request.use((config) => {
+  const session = JSON.parse(localStorage.getItem('session'));
+  const token = session?.token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const getOrganizations = async () => {
