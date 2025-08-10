@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import {
   Table, TableHead, TableRow, TableCell, TableBody,
   Button, TextField, Dialog, DialogTitle, DialogContent,
-  DialogActions, FormControl, InputLabel, Select, MenuItem, Typography
+  DialogActions, FormControl, InputLabel, Select, MenuItem,
+  Typography, Box
 } from '@mui/material';
 import {
   getOrganizations, getIndustries,
@@ -14,6 +15,8 @@ const Organizations = () => {
   const [organizations, setOrganizations] = useState([]);
   const [industries, setIndustries] = useState([]);
   const [search, setSearch] = useState('');
+  const [industryFilter, setIndustryFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [open, setOpen] = useState(false);
   const [editingOrg, setEditingOrg] = useState(null);
   const [form, setForm] = useState({
@@ -125,9 +128,15 @@ const Organizations = () => {
     fetchData();
   };
 
-  const filtered = organizations.filter(org =>
-    org.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter organizations by name, industry, and status
+  const filtered = organizations.filter(org => {
+    const matchesName = org.name.toLowerCase().includes(search.toLowerCase());
+    const matchesIndustry = industryFilter ? org.industry === industryFilter : true;
+    const matchesStatus = statusFilter
+      ? (statusFilter === 'active' ? org.is_active : !org.is_active)
+      : true;
+    return matchesName && matchesIndustry && matchesStatus;
+  });
 
   return (
     <>
@@ -137,12 +146,39 @@ const Organizations = () => {
         <Button variant="contained" onClick={() => handleOpen()}>Add Organization</Button>
       )}
 
-      <TextField
-        label="Search by name"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        sx={{ m: 2, width: '300px' }}
-      />
+      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: 2, mb: 2 }}>
+        <TextField
+          label="Search by name"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{ width: '300px' }}
+        />
+        <FormControl sx={{ minWidth: 180 }}>
+          <InputLabel>Filter by Industry</InputLabel>
+          <Select
+            value={industryFilter}
+            label="Filter by Industry"
+            onChange={(e) => setIndustryFilter(e.target.value)}
+          >
+            <MenuItem value="">All Industries</MenuItem>
+            {industries.map(ind => (
+              <MenuItem key={ind.id} value={ind.id}>{ind.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl sx={{ minWidth: 150 }}>
+          <InputLabel>Status</InputLabel>
+          <Select
+            value={statusFilter}
+            label="Status"
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="inactive">Inactive</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       <Table>
         <TableHead>
