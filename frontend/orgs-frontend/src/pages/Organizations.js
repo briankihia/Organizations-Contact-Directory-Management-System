@@ -105,9 +105,12 @@ const Organizations = () => {
   return (
     <>
       <Typography variant="h4" gutterBottom>Organizations</Typography>
-      {user && user.is_superuser && (
+
+      {/* Changed is_superuser check to role check */}
+      {user?.role === 'admin' && (
         <Button variant="contained" onClick={() => handleOpen()}>Add Organization</Button>
       )}
+
       <TextField
         label="Search by name"
         value={search}
@@ -131,7 +134,8 @@ const Organizations = () => {
               <TableCell>{org.industry}</TableCell>
               <TableCell>{org.is_active ? 'Active' : 'Inactive'}</TableCell>
               <TableCell>
-                {user?.is_superuser && (
+                {/* Changed is_superuser check to role check */}
+                {user?.role === 'admin' && (
                   <>
                     <Button onClick={() => handleOpen(org)}>Edit</Button>
                     <Button onClick={() => handleToggleStatus(org)}>

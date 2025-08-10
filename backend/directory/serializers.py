@@ -23,14 +23,12 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
-        # Add custom claims inside the JWT token
-        token['role'] = user.profile.role
+        # Add role claim based on is_superuser
+        token['role'] = 'admin' if user.is_superuser else 'normal'
         return token
 
     def validate(self, attrs):
         data = super().validate(attrs)
-
-        # Add role to the response body (so frontend can store it easily)
-        data['role'] = self.user.profile.role
+        # Add role in the response data
+        data['role'] = 'admin' if self.user.is_superuser else 'normal'
         return data
