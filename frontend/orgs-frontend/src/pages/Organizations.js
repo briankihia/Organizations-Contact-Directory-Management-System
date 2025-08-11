@@ -128,13 +128,15 @@ const Organizations = () => {
     fetchData();
   };
 
+  const isAdmin = user?.role === 'admin';
+
   // Filter organizations by name, industry, and status,
   // but hide inactive organizations from normal users
   const filtered = organizations.filter(org => {
     const matchesName = org.name.toLowerCase().includes(search.toLowerCase());
     const matchesIndustry = industryFilter ? org.industry === industryFilter : true;
 
-    if (user?.role !== 'admin') {
+    if (!isAdmin) {
       // Normal users see only active orgs
       return matchesName && matchesIndustry && org.is_active;
     }
@@ -151,7 +153,7 @@ const Organizations = () => {
     <>
       <Typography variant="h4" gutterBottom>Organizations</Typography>
 
-      {user?.role === 'admin' && (
+      {isAdmin && (
         <Button variant="contained" onClick={() => handleOpen()}>Add Organization</Button>
       )}
 
@@ -181,7 +183,7 @@ const Organizations = () => {
             value={statusFilter}
             label="Status"
             onChange={(e) => setStatusFilter(e.target.value)}
-            disabled={user?.role !== 'admin'} // disable for non-admins
+            disabled={!isAdmin} // disable for non-admins
           >
             <MenuItem value="">All</MenuItem>
             <MenuItem value="active">Active</MenuItem>
@@ -196,25 +198,23 @@ const Organizations = () => {
             <TableCell>Name</TableCell>
             <TableCell>Industry</TableCell>
             <TableCell>Status</TableCell>
-            <TableCell>Actions</TableCell>
+            {isAdmin && <TableCell>Actions</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
           {filtered.map((org) => (
             <TableRow key={org.id}>
               <TableCell>{org.name}</TableCell>
-              <TableCell>{org.industry}</TableCell>
+              <TableCell>{industries.find(ind => ind.id === org.industry)?.name || 'N/A'}</TableCell>
               <TableCell>{org.is_active ? 'Active' : 'Inactive'}</TableCell>
-              <TableCell>
-                {user?.role === 'admin' && (
-                  <>
-                    <Button onClick={() => handleOpen(org)}>Edit</Button>
-                    <Button onClick={() => handleToggleStatus(org)}>
-                      {org.is_active ? 'Deactivate' : 'Activate'}
-                    </Button>
-                  </>
-                )}
-              </TableCell>
+              {isAdmin && (
+                <TableCell>
+                  <Button onClick={() => handleOpen(org)}>Edit</Button>
+                  <Button onClick={() => handleToggleStatus(org)}>
+                    {org.is_active ? 'Deactivate' : 'Activate'}
+                  </Button>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
