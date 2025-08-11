@@ -11,6 +11,9 @@ import {
 } from '../api/organizations';
 import axios from 'axios';
 
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
 const Organizations = () => {
   const [organizations, setOrganizations] = useState([]);
   const [industries, setIndustries] = useState([]);
@@ -24,7 +27,7 @@ const Organizations = () => {
     logo_url: '', founded_date: '', tax_id: '',
     industry: ''
   });
-  const [errors, setErrors] = useState({}); // For inline validation errors
+  const [errors, setErrors] = useState({});
 
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -149,6 +152,32 @@ const Organizations = () => {
     return matchesName && matchesIndustry && matchesStatus;
   });
 
+  // Export filtered organizations to Excel
+  const exportToExcel = () => {
+    if (filtered.length === 0) {
+      alert('No organizations to export!');
+      return;
+    }
+
+    const dataToExport = filtered.map(org => ({
+      Name: org.name,
+      Description: org.description,
+      Website: org.website || '',
+      'Logo URL': org.logo_url || '',
+      'Founded Date': org.founded_date,
+      'Tax ID': org.tax_id,
+      Industry: industries.find(ind => ind.id === org.industry)?.name || 'N/A',
+      Status: org.is_active ? 'Active' : 'Inactive',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Organizations');
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    saveAs(blob, 'organizations_export.xlsx');
+  };
+
   return (
     <>
       <Typography variant="h4" gutterBottom>Organizations</Typography>
@@ -183,13 +212,22 @@ const Organizations = () => {
             value={statusFilter}
             label="Status"
             onChange={(e) => setStatusFilter(e.target.value)}
-            disabled={!isAdmin} // disable for non-admins
+            disabled={!isAdmin}
           >
             <MenuItem value="">All</MenuItem>
             <MenuItem value="active">Active</MenuItem>
             <MenuItem value="inactive">Inactive</MenuItem>
           </Select>
         </FormControl>
+
+        <Button
+          variant="outlined"
+          color="success"
+          onClick={exportToExcel}
+          sx={{ marginLeft: 'auto' }}
+        >
+          Export to Excel
+        </Button>
       </Box>
 
       <Table>
