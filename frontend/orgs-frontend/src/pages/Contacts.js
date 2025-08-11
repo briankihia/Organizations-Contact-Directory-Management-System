@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import {
   fetchContacts,
   createContact,
@@ -155,6 +157,38 @@ const Contacts = () => {
     return true;
   });
 
+  // Export filtered contacts to Excel
+  const exportToExcel = () => {
+    if (filteredContacts.length === 0) {
+      alert('No contacts to export!');
+      return;
+    }
+
+    const dataToExport = filteredContacts.map((contact) => {
+      const orgName = orgs.find((org) => org.id === contact.organization)?.name || 'N/A';
+      return {
+        'First Name': contact.first_name,
+        'Last Name': contact.last_name,
+        'Job Title': contact.job_title || '',
+        'Department': contact.department || '',
+        'Primary Contact': contact.is_primary_contact ? 'Yes' : 'No',
+        'Notes': contact.notes || '',
+        'Email': contact.email,
+        'Office Phone': contact.office_phone_number || '',
+        'Mobile Phone': contact.mobile_phone_number || '',
+        'Active': contact.is_active ? 'Yes' : 'No',
+        'Organization': orgName,
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Contacts');
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    saveAs(blob, 'contacts_export.xlsx');
+  };
+
   // Styles
   const styles = {
     container: {
@@ -192,9 +226,6 @@ const Contacts = () => {
       fontWeight: '600',
       fontSize: '1rem',
       transition: 'background-color 0.3s ease',
-    },
-    buttonPrimaryHover: {
-      backgroundColor: '#2980b9',
     },
     form: {
       border: '1px solid #ddd',
@@ -293,13 +324,25 @@ const Contacts = () => {
     actionButtonDanger: {
       backgroundColor: '#c0392b',
     },
+    exportButton: {
+      backgroundColor: '#27ae60',
+      color: 'white',
+      padding: '0.5rem 1.1rem',
+      border: 'none',
+      borderRadius: 4,
+      cursor: 'pointer',
+      fontWeight: '600',
+      fontSize: '1rem',
+      transition: 'background-color 0.3s ease',
+      marginBottom: '1rem',
+      float: 'right',
+    },
   };
 
   return (
     <div style={styles.container}>
       <h2 style={styles.heading}>Contacts</h2>
 
-      {/* Organization filter - available for all users */}
       <div style={styles.filterWrapper}>
         <label htmlFor="orgFilter">Filter by Organization:</label>
         <select
@@ -316,6 +359,17 @@ const Contacts = () => {
           ))}
         </select>
       </div>
+
+      {/* Export to Excel button (all users) */}
+      <button
+        onClick={exportToExcel}
+        style={styles.exportButton}
+        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1e8449')}
+        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#27ae60')}
+        title="Export filtered contacts to Excel"
+      >
+        Export to Excel
+      </button>
 
       {/* Admin-only Add Contact button */}
       {isAdmin && !showForm && (
@@ -470,7 +524,13 @@ const Contacts = () => {
                 <em>{contact.job_title || 'N/A'}</em>
               </small>{' '}
               <br />
-              Status: <span style={{ color: contact.is_active ? 'green' : 'red', fontWeight: '600' }}>
+              Status:{' '}
+              <span
+                style={{
+                  color: contact.is_active ? 'green' : 'red',
+                  fontWeight: '600',
+                }}
+              >
                 {contact.is_active ? 'Active' : 'Inactive'}
               </span>{' '}
               <br />
