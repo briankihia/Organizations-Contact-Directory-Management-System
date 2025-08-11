@@ -155,17 +155,158 @@ const Contacts = () => {
     return true;
   });
 
+  // Styles
+  const styles = {
+    container: {
+      maxWidth: 900,
+      margin: '2rem auto',
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      color: '#333',
+      padding: '0 1rem',
+    },
+    heading: {
+      textAlign: 'center',
+      marginBottom: '1.5rem',
+      color: '#2c3e50',
+    },
+    filterWrapper: {
+      marginBottom: '1.5rem',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+    },
+    select: {
+      padding: '0.4rem 0.6rem',
+      borderRadius: 4,
+      border: '1px solid #ccc',
+      fontSize: '1rem',
+      minWidth: 200,
+    },
+    buttonPrimary: {
+      backgroundColor: '#3498db',
+      color: 'white',
+      padding: '0.5rem 1.1rem',
+      border: 'none',
+      borderRadius: 4,
+      cursor: 'pointer',
+      fontWeight: '600',
+      fontSize: '1rem',
+      transition: 'background-color 0.3s ease',
+    },
+    buttonPrimaryHover: {
+      backgroundColor: '#2980b9',
+    },
+    form: {
+      border: '1px solid #ddd',
+      padding: '1.5rem',
+      borderRadius: 6,
+      marginBottom: '2rem',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      backgroundColor: '#fafafa',
+      maxWidth: 600,
+      margin: '1rem auto 2rem',
+    },
+    input: {
+      width: '100%',
+      padding: '0.5rem',
+      marginBottom: '1rem',
+      borderRadius: 4,
+      border: '1px solid #ccc',
+      fontSize: '1rem',
+      boxSizing: 'border-box',
+    },
+    textarea: {
+      width: '100%',
+      padding: '0.5rem',
+      marginBottom: '1rem',
+      borderRadius: 4,
+      border: '1px solid #ccc',
+      fontSize: '1rem',
+      resize: 'vertical',
+      minHeight: 80,
+      boxSizing: 'border-box',
+    },
+    labelCheckbox: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      marginBottom: '1rem',
+      fontWeight: '500',
+      fontSize: '0.9rem',
+      color: '#555',
+      userSelect: 'none',
+    },
+    formButtons: {
+      display: 'flex',
+      gap: '1rem',
+      justifyContent: 'flex-start',
+    },
+    cancelButton: {
+      backgroundColor: '#bdc3c7',
+      border: 'none',
+      borderRadius: 4,
+      color: '#2c3e50',
+      padding: '0.5rem 1rem',
+      cursor: 'pointer',
+      fontWeight: '600',
+      fontSize: '1rem',
+    },
+    contactList: {
+      listStyle: 'none',
+      paddingLeft: 0,
+      maxWidth: 900,
+      margin: '0 auto',
+    },
+    contactItem: {
+      backgroundColor: '#fff',
+      padding: '1rem 1.5rem',
+      marginBottom: '0.7rem',
+      borderRadius: 6,
+      boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      fontSize: '1rem',
+      color: '#2c3e50',
+    },
+    contactInfo: {
+      flex: '1 1 60%',
+      minWidth: 250,
+    },
+    contactActions: {
+      display: 'flex',
+      gap: '0.5rem',
+      flexWrap: 'wrap',
+    },
+    actionButton: {
+      backgroundColor: '#2980b9',
+      color: 'white',
+      border: 'none',
+      padding: '0.4rem 0.8rem',
+      borderRadius: 4,
+      cursor: 'pointer',
+      fontSize: '0.9rem',
+      fontWeight: '600',
+      transition: 'background-color 0.3s ease',
+    },
+    actionButtonDanger: {
+      backgroundColor: '#c0392b',
+    },
+  };
+
   return (
-    <div>
-      <h2>Contacts</h2>
+    <div style={styles.container}>
+      <h2 style={styles.heading}>Contacts</h2>
 
       {/* Organization filter - available for all users */}
-      <div style={{ marginBottom: '1rem' }}>
-        <label htmlFor="orgFilter">Filter by Organization: </label>
+      <div style={styles.filterWrapper}>
+        <label htmlFor="orgFilter">Filter by Organization:</label>
         <select
           id="orgFilter"
           value={selectedOrgFilter}
           onChange={(e) => setSelectedOrgFilter(e.target.value)}
+          style={styles.select}
         >
           <option value="">-- All Organizations --</option>
           {orgs.map((org) => (
@@ -178,17 +319,27 @@ const Contacts = () => {
 
       {/* Admin-only Add Contact button */}
       {isAdmin && !showForm && (
-        <button onClick={() => setShowForm(true)}>Add Contact</button>
+        <div style={{ textAlign: 'right', marginBottom: '1.5rem' }}>
+          <button
+            onClick={() => setShowForm(true)}
+            style={styles.buttonPrimary}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#2980b9')}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#3498db')}
+          >
+            Add Contact
+          </button>
+        </div>
       )}
 
       {/* Admin-only Add/Edit Form */}
       {isAdmin && showForm && (
-        <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
+        <form onSubmit={handleSubmit} style={styles.form}>
           <select
             name="organization"
             value={formData.organization}
             onChange={handleChange}
             required
+            style={styles.select}
           >
             <option value="">-- Select an Organization --</option>
             {orgs.map((org) => (
@@ -204,6 +355,7 @@ const Contacts = () => {
             onChange={handleChange}
             placeholder="First Name"
             required
+            style={styles.input}
           />
           <input
             name="last_name"
@@ -211,28 +363,31 @@ const Contacts = () => {
             onChange={handleChange}
             placeholder="Last Name"
             required
+            style={styles.input}
           />
           <input
             name="job_title"
             value={formData.job_title}
             onChange={handleChange}
             placeholder="Job Title"
+            style={styles.input}
           />
           <input
             name="department"
             value={formData.department}
             onChange={handleChange}
             placeholder="Department"
+            style={styles.input}
           />
 
-          <label>
-            Primary Contact:
+          <label style={styles.labelCheckbox}>
             <input
               type="checkbox"
               name="is_primary_contact"
               checked={formData.is_primary_contact}
               onChange={handleChange}
             />
+            Primary Contact
           </label>
 
           <textarea
@@ -240,6 +395,7 @@ const Contacts = () => {
             value={formData.notes}
             onChange={handleChange}
             placeholder="Notes"
+            style={styles.textarea}
           />
 
           <input
@@ -249,33 +405,47 @@ const Contacts = () => {
             onChange={handleChange}
             placeholder="Email"
             required
+            style={styles.input}
           />
           <input
             name="office_phone_number"
             value={formData.office_phone_number}
             onChange={handleChange}
             placeholder="Office Phone Number"
+            style={styles.input}
           />
           <input
             name="mobile_phone_number"
             value={formData.mobile_phone_number}
             onChange={handleChange}
             placeholder="Mobile Phone Number"
+            style={styles.input}
           />
 
-          <label>
-            Active:
+          <label style={styles.labelCheckbox}>
             <input
               type="checkbox"
               name="is_active"
               checked={formData.is_active}
               onChange={handleChange}
             />
+            Active
           </label>
 
-          <div>
-            <button type="submit">{editing ? 'Update' : 'Create'} Contact</button>
-            <button type="button" onClick={resetForm} style={{ marginLeft: 8 }}>
+          <div style={styles.formButtons}>
+            <button
+              type="submit"
+              style={styles.buttonPrimary}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#2980b9')}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#3498db')}
+            >
+              {editing ? 'Update' : 'Create'} Contact
+            </button>
+            <button
+              type="button"
+              onClick={resetForm}
+              style={styles.cancelButton}
+            >
               Cancel
             </button>
           </div>
@@ -283,30 +453,63 @@ const Contacts = () => {
       )}
 
       {/* Contact List */}
-      <ul>
+      <ul style={styles.contactList}>
+        {filteredContacts.length === 0 && (
+          <li style={{ textAlign: 'center', color: '#777', padding: '1rem' }}>
+            No contacts found.
+          </li>
+        )}
         {filteredContacts.map((contact) => (
-          <li key={contact.id}>
-            <strong>
-              {contact.first_name} {contact.last_name}
-            </strong>{' '}
-            - {contact.job_title || 'N/A'} - Status:{' '}
-            {contact.is_active ? 'Active' : 'Inactive'} - Company:{' '}
-            {orgs.find((org) => org.id === contact.organization)?.name || 'N/A'}
+          <li key={contact.id} style={styles.contactItem}>
+            <div style={styles.contactInfo}>
+              <strong>
+                {contact.first_name} {contact.last_name}
+              </strong>{' '}
+              <br />
+              <small>
+                <em>{contact.job_title || 'N/A'}</em>
+              </small>{' '}
+              <br />
+              Status: <span style={{ color: contact.is_active ? 'green' : 'red', fontWeight: '600' }}>
+                {contact.is_active ? 'Active' : 'Inactive'}
+              </span>{' '}
+              <br />
+              Company: {orgs.find((org) => org.id === contact.organization)?.name || 'N/A'}
+            </div>
 
             {/* Admin-only Edit/Activate/Deactivate */}
             {isAdmin && (
-              <>
-                <button onClick={() => handleEdit(contact)} style={{ marginLeft: 8 }}>
+              <div style={styles.contactActions}>
+                <button
+                  onClick={() => handleEdit(contact)}
+                  style={styles.actionButton}
+                  title="Edit Contact"
+                  onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1c5980')}
+                  onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#2980b9')}
+                >
                   Edit
                 </button>
                 <button
                   onClick={() => handleToggleActive(contact)}
-                  style={{ marginLeft: 4 }}
-                  title={contact.is_active ? "Deactivate contact" : "Activate contact"}
+                  style={{
+                    ...styles.actionButton,
+                    ...(contact.is_active ? styles.actionButtonDanger : {}),
+                  }}
+                  title={contact.is_active ? 'Deactivate contact' : 'Activate contact'}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = contact.is_active
+                      ? '#922b24'
+                      : '#1c5980';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = contact.is_active
+                      ? '#c0392b'
+                      : '#2980b9';
+                  }}
                 >
-                  {contact.is_active ? "Deactivate" : "Activate"}
+                  {contact.is_active ? 'Deactivate' : 'Activate'}
                 </button>
-              </>
+              </div>
             )}
           </li>
         ))}
