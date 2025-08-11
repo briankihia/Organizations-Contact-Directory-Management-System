@@ -4,7 +4,6 @@ import {
   fetchContacts,
   createContact,
   updateContact,
-  deleteContact,
 } from '../api/contacts';
 
 import { getOrganizations } from '../api/organizations';
@@ -13,6 +12,7 @@ const Contacts = () => {
   const [contacts, setContacts] = useState([]);
   const [orgs, setOrgs] = useState([]);
   const [user, setUser] = useState(null);
+  const [selectedOrgFilter, setSelectedOrgFilter] = useState('');
 
   const [formData, setFormData] = useState({
     id: null,
@@ -32,7 +32,6 @@ const Contacts = () => {
   const [editing, setEditing] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  // Load user and token from localStorage, set axios Authorization header
   useEffect(() => {
     const session = JSON.parse(localStorage.getItem('session'));
     if (session?.token) {
@@ -44,7 +43,6 @@ const Contacts = () => {
     }
   }, []);
 
-  // Load contacts and organizations once user is set
   useEffect(() => {
     if (user) {
       loadContacts();
@@ -134,24 +132,49 @@ const Contacts = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
+  // Toggle active status
+  const handleToggleActive = async (contact) => {
     try {
-      await deleteContact(id);
+      const updatedContact = { ...contact, is_active: !contact.is_active };
+      await updateContact(contact.id, updatedContact);
       loadContacts();
     } catch (err) {
-      console.error('Error deleting contact:', err);
+      console.error('Error toggling contact status:', err);
     }
   };
 
   const isAdmin = user?.role?.toLowerCase() === 'admin';
 
-  const displayedContacts = isAdmin
-    ? contacts
-    : contacts.filter((contact) => contact.is_active);
+  const filteredContacts = contacts.filter((contact) => {
+    if (!isAdmin && !contact.is_active) {
+      return false;
+    }
+    if (selectedOrgFilter && String(contact.organization) !== selectedOrgFilter) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <div>
       <h2>Contacts</h2>
+
+      {/* Organization filter - available for all users */}
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="orgFilter">Filter by Organization: </label>
+        <select
+          id="orgFilter"
+          value={selectedOrgFilter}
+          onChange={(e) => setSelectedOrgFilter(e.target.value)}
+        >
+          <option value="">-- All Organizations --</option>
+          {orgs.map((org) => (
+            <option key={org.id} value={String(org.id)}>
+              {org.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Admin-only Add Contact button */}
       {isAdmin && !showForm && (
@@ -169,7 +192,7 @@ const Contacts = () => {
           >
             <option value="">-- Select an Organization --</option>
             {orgs.map((org) => (
-              <option key={org.id} value={org.id}>
+              <option key={org.id} value={String(org.id)}>
                 {org.name}
               </option>
             ))}
@@ -261,7 +284,7 @@ const Contacts = () => {
 
       {/* Contact List */}
       <ul>
-        {displayedContacts.map((contact) => (
+        {filteredContacts.map((contact) => (
           <li key={contact.id}>
             <strong>
               {contact.first_name} {contact.last_name}
@@ -270,14 +293,18 @@ const Contacts = () => {
             {contact.is_active ? 'Active' : 'Inactive'} - Company:{' '}
             {orgs.find((org) => org.id === contact.organization)?.name || 'N/A'}
 
-            {/* Admin-only Edit/Delete */}
+            {/* Admin-only Edit/Activate/Deactivate */}
             {isAdmin && (
               <>
                 <button onClick={() => handleEdit(contact)} style={{ marginLeft: 8 }}>
                   Edit
                 </button>
-                <button onClick={() => handleDelete(contact.id)} style={{ marginLeft: 4 }}>
-                  Delete
+                <button
+                  onClick={() => handleToggleActive(contact)}
+                  style={{ marginLeft: 4 }}
+                  title={contact.is_active ? "Deactivate contact" : "Activate contact"}
+                >
+                  {contact.is_active ? "Deactivate" : "Activate"}
                 </button>
               </>
             )}
