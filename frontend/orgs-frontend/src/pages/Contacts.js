@@ -189,6 +189,38 @@ const Contacts = () => {
     saveAs(blob, 'contacts_export.xlsx');
   };
 
+  // Export filtered contacts to CSV (basic fields: name, email, phone)
+  const exportToCSV = () => {
+    if (filteredContacts.length === 0) {
+      alert('No contacts to export!');
+      return;
+    }
+
+    const headers = ['First Name', 'Last Name', 'Email', 'Phone'];
+
+    const rows = filteredContacts.map((contact) => {
+      const phone = contact.mobile_phone_number || contact.office_phone_number || '';
+      return [
+        contact.first_name,
+        contact.last_name,
+        contact.email,
+        phone,
+      ];
+    });
+
+    const csvContent =
+      [headers, ...rows]
+        .map(row =>
+          row
+            .map(field => `"${String(field).replace(/"/g, '""')}"`) // Escape quotes
+            .join(',')
+        )
+        .join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'contacts_export.csv');
+  };
+
   // Styles
   const styles = {
     container: {
@@ -360,16 +392,31 @@ const Contacts = () => {
         </select>
       </div>
 
-      {/* Export to Excel button (all users) */}
-      <button
-        onClick={exportToExcel}
-        style={styles.exportButton}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1e8449')}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#27ae60')}
-        title="Export filtered contacts to Excel"
-      >
-        Export to Excel
-      </button>
+      {/* Export Buttons */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.8rem', marginBottom: '1rem' }}>
+        <button
+          onClick={exportToExcel}
+          style={styles.exportButton}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1e8449')}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#27ae60')}
+          title="Export filtered contacts to Excel"
+        >
+          Export to Excel
+        </button>
+
+        <button
+          onClick={exportToCSV}
+          style={{
+            ...styles.exportButton,
+            backgroundColor: '#f39c12',
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#d78c0c')}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#f39c12')}
+          title="Export filtered contacts to CSV"
+        >
+          Export to CSV
+        </button>
+      </div>
 
       {/* Admin-only Add Contact button */}
       {isAdmin && !showForm && (
