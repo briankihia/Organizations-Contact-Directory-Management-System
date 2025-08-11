@@ -1,91 +1,107 @@
-About
-This project is a simple and effective web application designed to manage organizations and their contacts in one centralized directory. It allows users to register organizations, store detailed information about them, and maintain organized contacts related to each organization.
 
-Built with a Django backend, React frontend, and PostgreSQL database, it serves as a practical demonstration of full-stack development, CRUD operations, and relational data handling.
+# 📇 Organizations Contact Directory System
 
-Features
-Organizations Management
+**Personal Project | Internship Practice**  
+🗓️ Completed: 09 July 2025
 
-Add, edit, and view organizations with fields like name, industry, website, tax ID, and logo.
+---
 
-Industry classification through a predefined list.
+## ✨ About
 
-Activate or deactivate organizations without deleting data.
+This project is a **simple yet powerful** web app that helps you manage organizations and their contacts in one centralized directory.
 
-Contacts Management
+Built with **Django** (backend), **React** (frontend), and **PostgreSQL** (database), it demonstrates full-stack development skills — handling CRUD operations, relational data, and clean UI.
 
-Add and edit contacts linked to organizations.
+---
 
-Mark one contact as the primary contact per organization.
+## 🚀 Features
 
-Store multiple contact methods: email, office phone, mobile.
+### 🏢 Organization Management
+- Create, edit, and view organizations with details like name, industry, website, tax ID, and logo
+- Industry classification using a predefined dropdown list for consistency
+- Activate/deactivate organizations without deleting data
 
-Activate or deactivate contacts.
+### 👥 Contact Management
+- Add and manage contacts linked to organizations
+- Mark one primary contact per organization
+- Store multiple contact methods: email, office phone, mobile
+- Activate/deactivate contacts easily
 
-Search & Export
+### 🔍 Search & Export
+- Live search/filter organizations by name or industry
+- Export organizations and contacts as CSV files for reporting or sharing
 
-Search organizations by name or industry with live filtering.
+---
 
-Export organizations and contacts as CSV files for easy sharing or reporting.
+## 🛠️ Technologies Used
 
-Technologies Used
-Backend: Django (Python)
+| Backend    | Frontend    | Database    | Others               |
+|------------|-------------|-------------|----------------------|
+| Django     | React.js    | PostgreSQL  | Axios, Material UI, CSV export utilities |
 
-Frontend: React.js
+---
 
-Database: PostgreSQL
+## 🗄️ Database Overview
 
-API: RESTful endpoints
+- **Industries**: Industry types (e.g., Technology, Finance)  
+- **Organizations**: Detailed organization info linked to industries  
+- **Contacts**: Individuals linked to organizations, including primary contact flag and multiple contact methods
 
-Other Tools: Axios (for API calls), Material UI (for styling), CSV export utilities
+---
 
-Database Overview
-The database contains three main tables:
+## 🎯 Motivation
 
-Industries: Lists industry types (e.g., Technology, Finance).
+Created as part of an internship to:
+- Strengthen full-stack web development skills  
+- Design and manage relational databases  
+- Implement user-friendly CRUD operations  
+- Build scalable, maintainable codebases  
 
-Organizations: Stores organization details with a foreign key linking to Industries.
+---
 
-Contacts: Stores individuals linked to organizations, including contact info and a flag for primary contact.
+## ⚙️ How to Run
 
-Motivation
-This project was created as part of an internship program to solidify understanding of:
+### Backend
+```bash
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+venv\Scripts\activate     # Windows
 
-Full-stack web development using Django and React.
+# Install dependencies
+pip install -r requirements.txt
 
-Designing relational databases with PostgreSQL.
+# Configure PostgreSQL database settings in Django
 
-Implementing CRUD operations and managing user roles.
+# Run migrations and start server
+python manage.py migrate
+python manage.py runserver
+```
 
-Building clean, maintainable, and scalable code.
+### Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
 
-How to Run
-Backend:
+Open [http://localhost:3000](http://localhost:3000) in your browser to use the app.
 
-Set up a Python virtual environment.
+---
 
-Install dependencies from requirements.txt.
+## 🔮 Future Improvements
 
-Configure PostgreSQL database settings.
+- Add user authentication & role-based permissions  
+- Enhance UI with better filtering, sorting, and pagination  
+- Bulk import/export functionality  
+- Deploy on cloud platforms (Heroku, AWS, etc.)  
 
-Run Django migrations and start the server.
+---
 
-Frontend:
+## 📬 Contact
 
-Navigate to the React app folder.
+Feel free to explore the code and reach out if you'd like to collaborate or have questions!
 
-Run npm install to install dependencies.
+---
 
-Start the React development server with npm start.
-
-Future Improvements
-Add user authentication and role-based access control.
-
-Improve UI/UX with more advanced filtering and sorting.
-
-Implement pagination and bulk import/export features.
-
-Deploy the application on a cloud service for public access.
-
-Contact
-Feel free to check out the code and reach out if you want to collaborate or ask questions.
+*Made with ❤️ and ☕ during my internship journey.*
