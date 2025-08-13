@@ -5,6 +5,7 @@ import Organizations from "./pages/Organizations"; // import your Organisation p
 import Layout from './components/Layout';
 import Industries from "./pages/Industries";
 import Contacts from "./pages/Contacts"; // import your Contacts page
+import Registration from "./components/RegistrationPage/RegistrationPage";
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<Registration />} />
         <Route
           path="/organizations"
           element={<Layout><Organizations /></Layout>}
